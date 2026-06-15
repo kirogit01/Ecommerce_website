@@ -1,24 +1,26 @@
- import express from "express";
-import core from "cors";
-import dotenv from "dotenv";//es6 module import syntax
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
 import connectDB from "./config/db.js";
+import productRoutes from "./routes/productRoutes.js";
 
 dotenv.config();
 connectDB();
 
-const App = express();
-App.use(core());
+const app = express();
 
-App.get("/",(req,res)=>{
-    res.json({message:"Hello World"});
-})
+app.use(cors());
+app.use(express.json());
 
- const PORT = process.env.PORT || 5000;
+app.get("/", (req, res) => {
+  res.json({ message: "Hello World" });
+});
 
- App.listen(PORT,()=>{
-    console.log("app is running PORT 5000")
-    
- })
+// ✅ FIX: use router properly
+app.use("/api/products", productRoutes);
 
+const PORT = process.env.PORT || 5000;
 
-
+app.listen(PORT, () => {
+  console.log(`App running on port ${PORT}`);
+});
