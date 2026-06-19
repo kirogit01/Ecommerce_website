@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import productRoutes from "./routes/productRoutes.js";
 
+
 dotenv.config();
 connectDB();
 
@@ -15,6 +16,8 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.json({ message: "Hello World" });
 });
+
+
 
 // ✅ FIX: use router properly
 app.use("/api/products", productRoutes);

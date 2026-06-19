@@ -1,62 +1,97 @@
 import Product from "../models/product.js";
+import APIFeatures from "../utils/apiFeatures.js";
 
-// Create a new product
+// Create Product
+export const createProduct = async (req, res) => {
+    try {
 
-export const createProduct = async(req,res)=>{
-    try{
-        const  product = await Product.create(req.body); // craete method
-        res.status(201).json(product);
+        const product = await Product.create(req.body);
+
+        res.status(201).json({
+            success: true,
+            product
+        });
 
     } catch (error) {
-        res.status(400).json({ message: error.message });
+
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
+
     }
-}
-
-// Get all products
-
-export const getProducts = async(req,res)=>{
-    try{
-    
-        const getpro = await Product.find();
-        res.send("products -----")
-        res.json(products);
-    }
-    catch(err){
-        console.log(err)
-    }
-
-
 };
 
-// Get single product by ID
+// Get All Products
+export const getProducts = async (req, res) => {
+    try {
 
+        const resultPerPage = 5;
+
+        const apiFeatures = new APIFeatures(
+            Product.find(),
+            req.query
+        )
+            .search()
+            .filter()
+            .sort()
+            .pagination(resultPerPage);
+
+        const products = await apiFeatures.query;
+
+        res.status(200).json({
+            success: true,
+            count: products.length,
+            products
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+};
+
+// Get Single Product
 export const getProductById = async (req, res) => {
     try {
+
         const product = await Product.findById(req.params.id);
 
         if (!product) {
             return res.status(404).json({
+                success: false,
                 message: "Product not found"
             });
         }
 
-        res.status(200).json(product);
+        res.status(200).json({
+            success: true,
+            product
+        });
 
     } catch (error) {
+
         res.status(500).json({
+            success: false,
             message: error.message
         });
+
     }
 };
 
 // Update Product
-
 export const updateProduct = async (req, res) => {
     try {
+
         let product = await Product.findById(req.params.id);
 
         if (!product) {
             return res.status(404).json({
+                success: false,
                 message: "Product not found"
             });
         }
@@ -70,23 +105,30 @@ export const updateProduct = async (req, res) => {
             }
         );
 
-        res.status(200).json(product);
+        res.status(200).json({
+            success: true,
+            product
+        });
 
     } catch (error) {
+
         res.status(500).json({
+            success: false,
             message: error.message
         });
+
     }
 };
 
 // Delete Product
-
 export const deleteProduct = async (req, res) => {
     try {
+
         const product = await Product.findById(req.params.id);
 
         if (!product) {
             return res.status(404).json({
+                success: false,
                 message: "Product not found"
             });
         }
@@ -99,8 +141,11 @@ export const deleteProduct = async (req, res) => {
         });
 
     } catch (error) {
+
         res.status(500).json({
+            success: false,
             message: error.message
         });
+
     }
 };
