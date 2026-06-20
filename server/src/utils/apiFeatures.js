@@ -19,38 +19,36 @@ class APIFeatures {
         return this;
     }
 
-    // Filter by category and price
-    filter() {
-        const queryCopy = { ...this.queryStr };
+ filter() {
+    const queryObj = { ...this.queryStr };
 
-        // Remove fields that are not filters
-        const removeFields = [
-            "keyword",
-            "page",
-            "limit",
-            "sort"
-        ];
+    // remove non-filter fields
+    ["keyword", "page", "limit", "sort"].forEach(el => delete queryObj[el]);
 
-        removeFields.forEach(field => delete queryCopy[field]);
+    let mongoQuery = {};
 
-        // Price filtering
-        if (this.queryStr.minPrice || this.queryStr.maxPrice) {
-            queryCopy.price = {};
-
-            if (this.queryStr.minPrice) {
-                queryCopy.price.$gte = Number(this.queryStr.minPrice);
-            }
-
-            if (this.queryStr.maxPrice) {
-                queryCopy.price.$lte = Number(this.queryStr.maxPrice);
-            }
-        }
-
-        this.query = this.query.find(queryCopy);
-
-        return this;
+    // CATEGORY FILTER
+    if (queryObj.category) {
+        mongoQuery.category = queryObj.category;
     }
 
+    // PRICE FILTER
+    if (queryObj.minPrice || queryObj.maxPrice) {
+        mongoQuery.price = {};
+
+        if (queryObj.minPrice) {
+            mongoQuery.price.$gte = Number(queryObj.minPrice);
+        }
+
+        if (queryObj.maxPrice) {
+            mongoQuery.price.$lte = Number(queryObj.maxPrice);
+        }
+    }
+
+    this.query = this.query.find(mongoQuery);
+
+    return this;
+}
     // Sort products
     sort() {
         if (this.queryStr.sort) {
